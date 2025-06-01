@@ -1,0 +1,240 @@
+body {
+    font-family: 'Jersey 10', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    /* Light Theme Variables (Default) */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #f0f0f0;
+    --bg-tertiary: #e0e0e0;
+    --text-primary: #000000;
+    --text-secondary: #555555;
+    --text-inverted-primary: #FFFFFF; 
+    --text-inverted-secondary: #000000; 
+    --border-color: #cccccc;
+    --button-primary-bg: #000000;
+    --button-primary-text: #FFFFFF;
+    --button-primary-hover-bg: #222222;
+    --button-secondary-bg: #cccccc;
+    --button-secondary-text: #000000;
+    --button-secondary-hover-bg: #bbbbbb;
+    --input-bg: #f0f0f0;
+    --input-border: #cccccc;
+    --input-text: #000000;
+    --input-focus-border: #000000;
+    --icon-stroke-primary: #000000; 
+    --icon-stroke-secondary: #555555; 
+    --task-completed-bg: #d1d5db; 
+    --task-completed-text: #6b7280; 
+    --task-completed-opacity: 0.7;
+    --task-checkbox-completed-bg: #000000;
+    --task-checkbox-completed-border: #000000;
+    --task-checkbox-incomplete-border: #9ca3af; 
+    --checkmark-color: #FFFFFF; 
+    --link-color: #0000EE; /* Standard link blue */
+
+    --scrollbar-track: #e0e0e0;
+    --scrollbar-thumb: #a0a0a0;
+    --scrollbar-thumb-hover: #808080;
+}
+
+body.dark {
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1f1f1f;
+    --text-primary: #FFFFFF;
+    --text-secondary: #b0b0b0;
+    --text-inverted-primary: #000000;
+    --text-inverted-secondary: #FFFFFF;
+    --border-color: #333333;
+    --button-primary-bg: #FFFFFF;
+    --button-primary-text: #000000;
+    --button-primary-hover-bg: #e0e0e0;
+    --button-secondary-bg: #333333;
+    --button-secondary-text: #FFFFFF;
+    --button-secondary-hover-bg: #444444;
+    --input-bg: #2a2a2a;
+    --input-border: #444444;
+    --input-text: #FFFFFF;
+    --input-focus-border: #FFFFFF;
+    --icon-stroke-primary: #FFFFFF;
+    --icon-stroke-secondary: #b0b0b0;
+    --task-completed-bg: #374151; 
+    --task-completed-text: #9ca3af; 
+    --task-completed-opacity: 0.6;
+    --task-checkbox-completed-bg: #FFFFFF;
+    --task-checkbox-completed-border: #FFFFFF;
+    --task-checkbox-incomplete-border: #6b7280; 
+    --checkmark-color: #000000; 
+    --link-color: #87CEFA; /* Light blue for dark mode */
+
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #4a4a4a;
+    --scrollbar-thumb-hover: #6a6a6a;
+}
+
+.jersey-10-regular {
+    font-family: "Jersey 10", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+::-webkit-scrollbar { width: 8px; }
+/* Track and thumb styles set dynamically by JS based on theme */
+
+.page { display: none; }
+.page.active { display: flex; flex-direction: column; }
+
+/* THEMED HELPER CLASSES */
+.themed-bg-primary { background-color: var(--bg-primary); }
+.themed-bg-secondary { background-color: var(--bg-secondary); }
+.themed-bg-tertiary { background-color: var(--bg-tertiary); }
+.themed-text-primary { color: var(--text-primary); }
+.themed-text-secondary { color: var(--text-secondary); }
+.themed-border { border-color: var(--border-color); }
+.themed-border-b { border-bottom-width: 1px; border-color: var(--border-color); }
+
+
+.themed-button-primary {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+}
+.themed-button-primary:hover { background-color: var(--button-primary-hover-bg); }
+
+.themed-button-secondary {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+}
+.themed-button-secondary:hover { background-color: var(--button-secondary-hover-bg); }
+
+.themed-input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+.themed-input:focus { border-color: var(--input-focus-border); }
+        
+/* Icon specific styling */
+.menu-item.themed-text-primary svg,
+.nav-item.themed-text-primary svg { 
+    stroke: var(--icon-stroke-primary);
+}
+.menu-item.themed-text-secondary svg,
+.nav-item.themed-text-secondary svg {
+    stroke: var(--icon-stroke-secondary);
+}
+        
+/* Task specific theming */
+.task-item.completed {
+    background-color: var(--task-completed-bg);
+    opacity: var(--task-completed-opacity);
+}
+.task-item.completed .task-text {
+    color: var(--task-completed-text);
+    text-decoration: line-through;
+}
+.task-toggle-button {
+    border-width: 2px; 
+}
+.task-toggle-button.completed {
+    background-color: var(--task-checkbox-completed-bg);
+    border-color: var(--task-checkbox-completed-border);
+}
+.task-toggle-button.incomplete {
+    border-color: var(--task-checkbox-incomplete-border);
+}
+.task-toggle-button.completed .checkmark-icon {
+    stroke: var(--checkmark-color);
+}
+
+.pomodoro-time-display {
+    font-family: "Jersey 10", sans-serif;
+}
+
+/* Styling for the weekly calendar on homepage */
+.calendar-day-item {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    cursor: pointer; 
+}
+
+.calendar-day-item:hover:not(.current-calendar-day) {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    background-color: var(--bg-tertiary); 
+}
+body.dark .calendar-day-item:hover:not(.current-calendar-day) {
+    box-shadow: 0 6px 12px rgba(255,255,255,0.07);
+    background-color: var(--bg-tertiary);
+}
+
+.calendar-day-item.current-calendar-day {
+   /* Highlighting is primarily done by adding .themed-button-primary class via JS */
+}
+
+/* Homepage Review Section Transitions */
+#homepage-review-section {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    opacity: 0;
+    transform: translateY(20px);
+}
+#homepage-review-section:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Policy Content Styling */
+.policy-content p, 
+.policy-content ul, 
+.policy-content ol {
+    margin-bottom: 1rem; 
+    line-height: 1.7; 
+    font-size: 1.125rem; 
+}
+.policy-content h2 {
+    font-size: 1.875rem; 
+    margin-top: 2rem;   
+    margin-bottom: 1rem; 
+    font-weight: bold;
+    letter-spacing: 0.025em; 
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+.policy-content h3 {
+    font-size: 1.5rem; 
+    margin-top: 1.5rem; 
+    margin-bottom: 0.75rem; 
+    font-weight: bold;
+    letter-spacing: 0.025em; 
+    color: var(--text-primary);
+}
+.policy-content ul {
+    list-style-type: disc;
+    margin-left: 1.75rem; 
+}
+.policy-content ol {
+    list-style-type: decimal;
+    margin-left: 1.75rem; 
+}
+.policy-content a {
+    color: var(--link-color);
+    text-decoration: underline;
+}
+.policy-content a:hover {
+    opacity: 0.8;
+}
+.policy-content strong {
+    font-weight: bold;
+    color: var(--text-primary);
+}
+.policy-content code {
+  font-family: Consolas, 'Courier New', Courier, monospace;
+  font-size: 0.9em;          
+  background-color: var(--bg-secondary); 
+  padding: 0.1em 0.3em;     
+  border-radius: 3px; 
+  border: 1px solid var(--border-color);
+  color: var(--text-primary); 
+}
+body.dark .policy-content code {
+    /* color: var(--text-primary); /* Ensures good contrast in dark mode too */
+}

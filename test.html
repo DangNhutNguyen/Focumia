@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Focumia - Focus & Tasks (Rebuilt Theme)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+
+            font-family: 'Jersey 10', sans-serif;
+
+            transition: background-color 0.3s ease, color 0.3s ease;
+
+
+            /* Light Theme Variables (Default) */
+
+            --bg-primary: #FFFFFF;
+
+            --bg-secondary: #f0f0f0;
+
+            --bg-tertiary: #e0e0e0;
+
+            --text-primary: #000000;
+
+            --text-secondary: #555555;
+
+            --text-inverted-primary: #FFFFFF;
+            /* For dark text on light buttons */
+
+            --text-inverted-secondary: #000000;
+            /* For light text on dark buttons */
+
+            --border-color: #cccccc;
+
+            --button-primary-bg: #000000;
+
+            --button-primary-text: #FFFFFF;
+
+            --button-primary-hover-bg: #222222;
+
+            --button-secondary-bg: #cccccc;
+
+            --button-secondary-text: #000000;
+
+            --button-secondary-hover-bg: #bbbbbb;
+
+            --input-bg: #f0f0f0;
+
+            --input-border: #cccccc;
+
+            --input-text: #000000;
+
+            --input-focus-border: #000000;
+
+            --icon-stroke-primary: #000000;
+            /* For active nav icons */
+
+            --icon-stroke-secondary: #555555;
+            /* For inactive nav icons */
+
+            --task-completed-bg: #d1d5db;
+            /* gray-300 */
+
+            --task-completed-text: #6b7280;
+            /* gray-500 */
+
+            --task-completed-opacity: 0.7;
+
+            --task-checkbox-completed-bg: #000000;
+
+            --task-checkbox-completed-border: #000000;
+
+            --task-checkbox-incomplete-border: #9ca3af;
+            /* gray-400 */
+
+            --checkmark-color: #FFFFFF;
+            /* Color of checkmark on dark background */
+
+
+            --scrollbar-track: #e0e0e0;
+
+            --scrollbar-thumb: #a0a0a0;
+
+            --scrollbar-thumb-hover: #808080;
+
+        }
+
+
+        body.dark {
+
+            --bg-primary: #000000;
+
+            --bg-secondary: #111111;
+
+            --bg-tertiary: #1f1f1f;
+
+            --text-primary: #FFFFFF;
+
+            --text-secondary: #b0b0b0;
+
+            --text-inverted-primary: #000000;
+
+            --text-inverted-secondary: #FFFFFF;
+
+            --border-color: #333333;
+
+            --button-primary-bg: #FFFFFF;
+
+            --button-primary-text: #000000;
+
+            --button-primary-hover-bg: #e0e0e0;
+
+            --button-secondary-bg: #333333;
+
+            --button-secondary-text: #FFFFFF;
+
+            --button-secondary-hover-bg: #444444;
+
+            --input-bg: #2a2a2a;
+
+            --input-border: #444444;
+
+            --input-text: #FFFFFF;
+
+            --input-focus-border: #FFFFFF;
+
+            --icon-stroke-primary: #FFFFFF;
+
+            --icon-stroke-secondary: #b0b0b0;
+
+            --task-completed-bg: #374151;
+            /* gray-700 */
+
+            --task-completed-text: #9ca3af;
+            /* gray-400 */
+
+            --task-completed-opacity: 0.6;
+
+            --task-checkbox-completed-bg: #FFFFFF;
+
+            --task-checkbox-completed-border: #FFFFFF;
+
+            --task-checkbox-incomplete-border: #6b7280;
+            /* gray-500 */
+
+            --checkmark-color: #000000;
+            /* Color of checkmark on light background */
+
+
+            --scrollbar-track: #1a1a1a;
+
+            --scrollbar-thumb: #4a4a4a;
+
+            --scrollbar-thumb-hover: #6a6a6a;
+
+        }
+
+
+        .jersey-10-regular {
+
+            font-family: "Jersey 10", sans-serif;
+
+            font-weight: 400;
+
+            font-style: normal;
+
+        }
+
+
+        /* Custom scrollbar - now uses CSS vars that JS will update */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        /* Track and thumb are set by dynamic-scrollbar-style in JS */
+
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* THEMED HELPER CLASSES USING CSS Variables */
+
+        .themed-bg-primary {
+            background-color: var(--bg-primary);
+        }
+
+        .themed-bg-secondary {
+            background-color: var(--bg-secondary);
+        }
+
+        .themed-bg-tertiary {
+            background-color: var(--bg-tertiary);
+        }
+
+        .themed-text-primary {
+            color: var(--text-primary);
+        }
+
+        .themed-text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .themed-border {
+            border-color: var(--border-color);
+        }
+
+
+        .themed-button-primary {
+
+            background-color: var(--button-primary-bg);
+
+            color: var(--button-primary-text);
+
+        }
+
+        .themed-button-primary:hover {
+            background-color: var(--button-primary-hover-bg);
+        }
+
+
+        .themed-button-secondary {
+
+            background-color: var(--button-secondary-bg);
+
+            color: var(--button-secondary-text);
+
+        }
+
+        .themed-button-secondary:hover {
+            background-color: var(--button-secondary-hover-bg);
+        }
+
+
+        .themed-input {
+
+            background-color: var(--input-bg);
+
+            border-color: var(--input-border);
+
+            color: var(--input-text);
+
+        }
+
+        .themed-input:focus {
+            border-color: var(--input-focus-border);
+        }
+
+        .themed-checkbox {
+
+            /* Tailwind classes like 'accent-white dark:accent-black' might be more robust for checkboxes */
+
+        }
+
+
+        /* Icon specific styling */
+
+        /* Styles for .nav-item icons can be kept if menu items might get icons later, or removed if not needed */
+
+        .menu-item.themed-text-primary svg,
+        /* If menu items get icons */
+
+        .nav-item.themed-text-primary svg {
+
+            stroke: var(--icon-stroke-primary);
+
+        }
+
+        .menu-item.themed-text-secondary svg,
+        /* If menu items get icons */
+
+        .nav-item.themed-text-secondary svg {
+
+            stroke: var(--icon-stroke-secondary);
+
+        }
+
+        /* Task specific theming */
+
+        .task-item.completed {
+
+            background-color: var(--task-completed-bg);
+
+            opacity: var(--task-completed-opacity);
+
+        }
+
+        .task-item.completed .task-text {
+
+            color: var(--task-completed-text);
+
+            text-decoration: line-through;
+
+        }
+
+        .task-toggle-button {
+
+            border-width: 2px;
+            /* Keep consistent border */
+
+        }
+
+        .task-toggle-button.completed {
+
+            background-color: var(--task-checkbox-completed-bg);
+
+            border-color: var(--task-checkbox-completed-border);
+
+        }
+
+        .task-toggle-button.incomplete {
+
+            border-color: var(--task-checkbox-incomplete-border);
+
+        }
+
+        .task-toggle-button.completed .checkmark-icon {
+
+            stroke: var(--checkmark-color);
+
+        }
+
+
+        .pomodoro-time-display {
+
+            font-family: "Jersey 10", sans-serif;
+
+        }
+    </style>
+
+</head>
+
+<body class="themed-bg-primary themed-text-primary">
+    <div id="app-root">
+
+
+        <div id="splash-screen"
+            class="page active h-screen flex-col items-center justify-center p-4 jersey-10-regular themed-bg-primary themed-text-primary">
+
+            <h1 class="text-8xl md:text-9xl font-bold tracking-wider">Focumia</h1>
+
+            <p class="text-3xl md:text-4xl mt-2 tracking-wide">start - focus - finish</p>
+
+            <p class="text-lg md:text-xl mt-10 absolute bottom-10 opacity-70">Rebuilt Theme Edition</p>
+
+        </div>
+
+
+        <div id="main-app-area" class="hidden">
+
+            <header id="app-header"
+                class="fixed top-0 left-0 right-0 themed-bg-primary themed-text-primary p-4 flex justify-between items-center z-50 border-b themed-border jersey-10-regular">
+
+                <h1 class="text-5xl font-bold tracking-wider">Focumia</h1>
+
+                <div class="flex items-center space-x-4">
+
+                    <button id="theme-toggle-button" class="p-2 rounded-md hover:themed-bg-tertiary">
+
+                    </button>
+
+                    <div class="relative">
+
+                        <button id="menu-button" class="p-2 rounded-md hover:themed-bg-tertiary">
+
+                        </button>
+
+                        <div id="menu-dropdown"
+                            class="hidden absolute right-0 mt-2 w-48 themed-bg-tertiary rounded-md shadow-lg py-1 z-50 border themed-border">
+
+                            <button data-page="home"
+                                class="menu-item block w-full text-left px-4 py-3 text-xl hover:themed-bg-secondary themed-text-primary">Home</button>
+
+                            <button data-page="streaks"
+                                class="menu-item block w-full text-left px-4 py-3 text-xl hover:themed-bg-secondary themed-text-primary">Streaks</button>
+
+                            <button data-page="settings"
+                                class="menu-item block w-full text-left px-4 py-3 text-xl hover:themed-bg-secondary themed-text-primary">Settings</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <main id="page-content" class="pt-24 pb-8 px-4 md:px-8">
+
+                <div id="home-page" class="page items-center jersey-10-regular">
+
+                    <div id="pomodoro-timer-section"
+                        class="themed-bg-tertiary p-6 md:p-10 rounded-lg shadow-2xl text-center w-full max-w-2xl mx-auto">
+
+                        <h2 id="pomodoro-status-text"
+                            class="text-4xl md:text-5xl mb-6 tracking-wide themed-text-primary">Focus Time</h2>
+
+                        <div id="pomodoro-time-display"
+                            class="text-8xl md:text-9xl mb-8 tracking-tighter pomodoro-time-display themed-text-primary">
+                            25:00</div>
+
+                        <div
+                            class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+
+                            <button id="timer-start-pause-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-primary px-6 py-3 rounded text-3xl">
+
+                                Start
+
+                            </button>
+
+                            <button id="timer-reset-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-secondary px-6 py-3 rounded text-3xl">
+
+                                Reset
+
+                            </button>
+
+                            <button id="timer-skip-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-secondary px-6 py-3 rounded text-3xl">
+
+                                Skip
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="task-list-section"
+                        class="themed-bg-tertiary p-6 md:p-8 rounded-lg shadow-2xl w-full max-w-2xl mx-auto mt-12 jersey-10-regular">
+
+                        <h2 class="text-4xl md:text-5xl mb-6 tracking-wide text-center themed-text-primary">Checklist
+                        </h2>
+
+                        <div class="flex mb-6">
+
+                            <input type="text" id="new-task-input" placeholder="Add a new task..."
+                                class="flex-grow p-3 themed-input rounded-l-md text-xl focus:outline-none border">
+
+                            <button id="add-task-button" class="themed-button-primary p-3 rounded-r-md">
+
+                            </button>
+
+                        </div>
+
+                        <div id="tasks-loading" class="text-center text-xl themed-text-secondary hidden">Loading
+                            tasks...</div>
+
+                        <ul id="task-list-ul" class="space-y-3">
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <div id="settings-page" class="page items-center jersey-10-regular">
+
+                    <div class="w-full max-w-3xl mx-auto">
+
+                        <h1 class="text-6xl md:text-7xl mb-10 text-center tracking-wide themed-text-primary">Settings
+                        </h1>
+
+                        <div id="settings-message"
+                            class="bg-green-600 text-white p-3 rounded mb-6 text-center text-xl hidden"></div>
+
+
+                        <div class="themed-bg-tertiary p-6 md:p-8 rounded-lg shadow-2xl mb-10">
+
+                            <h2 class="text-4xl md:text-5xl mb-6 tracking-wide themed-text-primary">Timer Settings</h2>
+
+                            <form id="timer-settings-form" class="space-y-6 text-2xl md:text-3xl themed-text-secondary">
+
+                                <div>
+
+                                    <label for="pomodoroDuration" class="block mb-1">Pomodoro Duration
+                                        (minutes):</label>
+
+                                    <input type="number" name="pomodoroDuration" id="pomodoroDuration"
+                                        class="w-full p-3 themed-input rounded focus:outline-none border">
+
+                                </div>
+
+                                <div>
+
+                                    <label for="shortBreakDuration" class="block mb-1">Short Break (minutes):</label>
+
+                                    <input type="number" name="shortBreakDuration" id="shortBreakDuration"
+                                        class="w-full p-3 themed-input rounded focus:outline-none border">
+
+                                </div>
+
+                                <div>
+
+                                    <label for="longBreakDuration" class="block mb-1">Long Break (minutes):</label>
+
+                                    <input type="number" name="longBreakDuration" id="longBreakDuration"
+                                        class="w-full p-3 themed-input rounded focus:outline-none border">
+
+                                </div>
+
+                                <div>
+
+                                    <label for="pomodorosBeforeLongBreak" class="block mb-1">Pomodoros before Long
+                                        Break:</label>
+
+                                    <input type="number" name="pomodorosBeforeLongBreak" id="pomodorosBeforeLongBreak"
+                                        class="w-full p-3 themed-input rounded focus:outline-none border">
+
+                                </div>
+
+                                <div class="flex items-center mt-4">
+
+                                    <input type="checkbox" name="soundNotifications" id="soundNotifications"
+                                        class="w-6 h-6 mr-3 rounded focus:ring-0 themed-checkbox border themed-border">
+
+                                    <label for="soundNotifications">Enable Sound Notifications</label>
+
+                                </div>
+
+                                <div class="flex items-center">
+
+                                    <input type="checkbox" name="browserNotifications" id="browserNotifications"
+                                        class="w-6 h-6 mr-3 rounded focus:ring-0 themed-checkbox border themed-border">
+
+                                    <label for="browserNotifications">Enable Browser Notifications</label>
+
+                                </div>
+
+                                <button type="submit"
+                                    class="mt-8 w-full themed-button-primary py-3 rounded text-2xl">Save Timer
+                                    Settings</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div id="streaks-page" class="page items-center jersey-10-regular">
+
+                    <div id="pomodoro-timer-section"
+                        class="themed-bg-tertiary p-6 md:p-10 rounded-lg shadow-2xl text-center w-full max-w-2xl mx-auto">
+
+                        <h2 id="pomodoro-status-text"
+                            class="text-4xl md:text-5xl mb-6 tracking-wide themed-text-primary">Focus Time</h2>
+
+                        <div id="pomodoro-time-display"
+                            class="text-8xl md:text-9xl mb-8 tracking-tighter pomodoro-time-display themed-text-primary">
+                            25:00</div>
+
+                        <div
+                            class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+
+                            <button id="timer-start-pause-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-primary px-6 py-3 rounded text-3xl">
+
+                                Start
+
+                            </button>
+
+                            <button id="timer-reset-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-secondary px-6 py-3 rounded text-3xl">
+
+                                Reset
+
+                            </button>
+
+                            <button id="timer-skip-button"
+                                class="w-full sm:w-auto flex items-center justify-center themed-button-secondary px-6 py-3 rounded text-3xl">
+
+                                Skip
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="task-list-section"
+                        class="themed-bg-tertiary p-6 md:p-8 rounded-lg shadow-2xl w-full max-w-2xl mx-auto mt-12 jersey-10-regular">
+
+                        <h2 class="text-4xl md:text-5xl mb-6 tracking-wide text-center themed-text-primary">Checklist
+                        </h2>
+
+                        <div class="flex mb-6">
+
+                            <input type="text" id="new-task-input" placeholder="Add a new task..."
+                                class="flex-grow p-3 themed-input rounded-l-md text-xl focus:outline-none border">
+
+                            <button id="add-task-button" class="themed-button-primary p-3 rounded-r-md">
+
+                            </button>
+
+                        </div>
+
+                        <div id="tasks-loading" class="text-center text-xl themed-text-secondary hidden">Loading
+                            tasks...</div>
+
+                        <ul id="task-list-ul" class="space-y-3">
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+
+        </div>
+
+        <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-clear-announce-tones-2861.mp3"
+            preload="auto"></audio>
+
+    </div>
+
+
+    <script type="module">
+
+        // --- Global State & DOM Elements ---
+
+        let currentTheme = localStorage.getItem('focumia-theme') || 'light';
+
+        let currentTimerSettings = {
+
+            pomodoroDuration: 25, shortBreakDuration: 5, longBreakDuration: 15,
+
+            pomodorosBeforeLongBreak: 4, soundNotifications: true, browserNotifications: true,
+
+        };
+
+        let tasksCache = [];
+
+        let pomodoroInterval = null;
+
+        let timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+
+        let isTimerActive = false;
+
+        let isBreakTime = false;
+
+        let pomodorosSessionCount = 0;
+
+
+        const bodyEl = document.body;
+
+        const splashScreenEl = document.getElementById('splash-screen');
+
+        const mainAppAreaEl = document.getElementById('main-app-area');
+
+        const pageContentEl = document.getElementById('page-content');
+
+        const allPages = document.querySelectorAll('.page');
+
+        const themeToggleButton = document.getElementById('theme-toggle-button');
+
+        const menuButton = document.getElementById('menu-button');
+
+        const menuDropdown = document.getElementById('menu-dropdown');
+
+        const pomodoroStatusTextEl = document.getElementById('pomodoro-status-text');
+
+        const pomodoroTimeDisplayEl = document.getElementById('pomodoro-time-display');
+
+        const timerStartPauseButton = document.getElementById('timer-start-pause-button');
+
+        const timerResetButton = document.getElementById('timer-reset-button');
+
+        const timerSkipButton = document.getElementById('timer-skip-button');
+
+
+        const newTaskInput = document.getElementById('new-task-input');
+
+        const addTaskButton = document.getElementById('add-task-button');
+
+        const taskListUl = document.getElementById('task-list-ul');
+
+        const tasksLoadingDiv = document.getElementById('tasks-loading');
+
+
+        const timerSettingsForm = document.getElementById('timer-settings-form');
+
+        const settingsMessageDiv = document.getElementById('settings-message');
+
+        const notificationSound = document.getElementById('notification-sound');
+
+
+        const ICONS = {
+
+            sun: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-6.364-.386l1.591-1.591M3 12h2.25m.386-6.364l1.591 1.591M12 12a2.25 2.25 0 00-2.25 2.25c0 1.37.295 2.655.82 3.801M12 12a2.25 2.25 0 01-2.25-2.25 2.25 2.25 0 012.25-2.25 2.25 2.25 0 012.25 2.25c-.001.745-.224 1.43-.606 2.005M15 15.75a3 3 0 01-6 0m3-10.5V4.5" /></svg>`,
+
+            moon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21c3.73 0 7.01-1.739 9.002-4.498z" /></svg>`,
+
+            menu: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>`,
+
+            play: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>`,
+
+            pause: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" /></svg>`,
+
+            reset: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>`,
+
+            skip: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" /></svg>`,
+
+            plus: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
+
+            check: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" class="w-5 h-5 checkmark-icon"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>`,
+
+            focus: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-8 h-8 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a8.965 8.965 0 006.068-2.401m-12.136 0A8.965 8.965 0 0012 21m0 0V12.5M3.29 15.96A8.965 8.965 0 012.25 12c0-2.06.694-3.956 1.857-5.49M12 2.25C9.24 2.25 6.85 3.585 5.147 5.489M18.853 5.489A8.91 8.91 0 0121.75 12c0 2.06-.694 3.956-1.857 5.49m-2.749-1.06A5.23 5.23 0 0015.75 12c0-1.622-.742-3.056-1.897-3.995" /></svg>`,
+
+            settings: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-8 h-8 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93L15.62 6.3c.528.194.886.74 1.004 1.294l.542 2.595c.12.572-.114 1.17-.624 1.438l-1.132.657c-.24.138-.39.396-.39.676v1.046c0 .28.15.538.39.676l1.132.657c.51.268.744.866.624 1.438l-.542 2.595c-.118.554-.476 1.1-1.004 1.294l-1.036.383c-.395.165-.71.505-.78.93l-.149.894c-.09.542-.56.94-1.11.94h-1.093c-.55 0-1.02-.398-1.11-.94l-.149-.894a1.19 1.19 0 01-.78-.93l-1.036-.383c-.528-.194-.886.74-1.004-1.294l-.542-2.595c-.12-.572.114-1.17.624 1.438l1.132-.657c.24-.138.39.396-.39.676v-1.046c0-.28-.15-.538-.39-.676l-1.132-.657c-.51-.268-.744.866-.624-1.438l.542 2.595c.118-.554.476 1.1 1.004 1.294l1.036-.383c.395.165.71.505.78.93l.149.894z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
+
+        };
+
+
+        function applyTheme(theme) {
+
+            if (theme === 'dark') {
+
+                bodyEl.classList.add('dark');
+
+            } else {
+
+                bodyEl.classList.remove('dark');
+
+            }
+
+            localStorage.setItem('focumia-theme', theme);
+
+            themeToggleButton.innerHTML = theme === 'dark' ? ICONS.sun : ICONS.moon;
+
+
+            const scrollbarStyle = document.getElementById('dynamic-scrollbar-style');
+
+            if (scrollbarStyle) scrollbarStyle.remove();
+
+
+            const newScrollbarStyle = document.createElement('style');
+
+            newScrollbarStyle.id = 'dynamic-scrollbar-style';
+
+            const computedStyles = getComputedStyle(bodyEl);
+
+            newScrollbarStyle.innerHTML = `
+
+::-webkit-scrollbar-track { background: ${computedStyles.getPropertyValue('--scrollbar-track')}; }
+
+::-webkit-scrollbar-thumb { background: ${computedStyles.getPropertyValue('--scrollbar-thumb')}; border-radius: 4px; }
+
+::-webkit-scrollbar-thumb:hover { background: ${computedStyles.getPropertyValue('--scrollbar-thumb-hover')}; }
+
+`;
+
+            document.head.appendChild(newScrollbarStyle);
+
+            renderTasks(tasksCache);
+
+        }
+
+        function showPage(pageId) {
+
+            allPages.forEach(page => {
+
+                if (page.id === pageId) {
+
+                    page.classList.add('active');
+
+                    page.classList.remove('hidden');
+
+                } else {
+
+                    page.classList.remove('active');
+
+                    page.classList.add('hidden');
+
+                }
+
+            });
+
+            // REMOVED: Logic for styling #app-footer-nav .nav-item
+
+            menuDropdown.classList.add('hidden');
+
+        }
+
+
+        function formatTime(seconds) {
+
+            const minutes = Math.floor(seconds / 60);
+
+            const secs = seconds % 60;
+
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        }
+
+
+        function updateTimerDisplay() {
+
+            pomodoroTimeDisplayEl.textContent = formatTime(timeLeftInSeconds);
+
+            pomodoroStatusTextEl.textContent = isBreakTime ? "Break Time" : "Focus Time";
+
+            timerStartPauseButton.innerHTML = isTimerActive ? `${ICONS.pause} Pause` : `${ICONS.play} Start`;
+
+        }
+
+
+        function playNotifSound() {
+
+            if (currentTimerSettings.soundNotifications && notificationSound) {
+
+                notificationSound.play().catch(e => console.warn("Audio play failed:", e));
+
+            }
+
+        }
+
+        function showBrowserNotification(title, body) {
+
+            if (currentTimerSettings.browserNotifications && Notification.permission === "granted") {
+
+                new Notification(title, { body });
+
+            }
+
+        }
+
+
+        function handlePomodoroCompletion() {
+
+            console.log("Pomodoro completed.");
+
+        }
+
+
+        function startNextCycle() {
+
+            isTimerActive = false;
+
+            if (isBreakTime) {
+
+                isBreakTime = false;
+
+                timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+
+                showBrowserNotification("Break Over!", "Time to get back to focus!");
+
+            } else {
+
+                handlePomodoroCompletion();
+
+                pomodorosSessionCount++;
+
+                isBreakTime = true;
+
+                timeLeftInSeconds = (pomodorosSessionCount % currentTimerSettings.pomodorosBeforeLongBreak === 0) ?
+
+                    currentTimerSettings.longBreakDuration * 60 :
+
+                    currentTimerSettings.shortBreakDuration * 60;
+
+                showBrowserNotification("Pomodoro Complete!", "Time for a break!");
+
+            }
+
+            playNotifSound();
+
+            updateTimerDisplay();
+
+        }
+
+
+        function tick() {
+
+            if (timeLeftInSeconds > 0) {
+
+                timeLeftInSeconds--;
+
+                updateTimerDisplay();
+
+            } else {
+
+                clearInterval(pomodoroInterval);
+
+                pomodoroInterval = null;
+
+                startNextCycle();
+
+            }
+
+        }
+
+
+        timerStartPauseButton.addEventListener('click', () => {
+
+            isTimerActive = !isTimerActive;
+
+            if (isTimerActive && !pomodoroInterval) {
+
+                pomodoroInterval = setInterval(tick, 1000);
+
+            } else if (!isTimerActive && pomodoroInterval) {
+
+                clearInterval(pomodoroInterval);
+
+                pomodoroInterval = null;
+
+            }
+
+            updateTimerDisplay();
+
+        });
+
+
+        timerResetButton.addEventListener('click', () => {
+
+            clearInterval(pomodoroInterval);
+
+            pomodoroInterval = null;
+
+            isTimerActive = false; isBreakTime = false; pomodorosSessionCount = 0;
+
+            timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+
+            updateTimerDisplay();
+
+        });
+
+
+        timerSkipButton.addEventListener('click', () => {
+
+            clearInterval(pomodoroInterval);
+
+            pomodoroInterval = null;
+
+            startNextCycle();
+
+            updateTimerDisplay();
+
+        });
+
+
+        function saveTasksToLocalStorage() {
+
+            localStorage.setItem('focumia-tasks', JSON.stringify(tasksCache));
+
+        }
+
+
+        function loadTasksFromLocalStorage() {
+
+            const storedTasks = localStorage.getItem('focumia-tasks');
+
+            tasksCache = storedTasks ? (JSON.parse(storedTasks) || []) : [];
+
+            renderTasks(tasksCache);
+
+        }
+
+        function renderTasks(tasks) {
+
+            taskListUl.innerHTML = '';
+
+            if (tasks.length === 0) {
+
+                taskListUl.innerHTML = `<li class="text-center themed-text-secondary text-xl">No tasks yet. Add one!</li>`;
+
+                return;
+
+            }
+
+            tasks.forEach(task => {
+
+                const li = document.createElement('li');
+
+                li.className = `task-item flex items-center justify-between p-3 rounded-md themed-bg-secondary ${task.completed ? 'completed' : ''}`;
+
+                const checkIconHTML = task.completed ? ICONS.check : '';
+
+
+                li.innerHTML = `
+
+<div class="flex items-center">
+
+<button data-task-id="${task.id}" class="task-toggle-button w-7 h-7 mr-4 rounded flex items-center justify-center transition-all ${task.completed ? 'completed' : 'incomplete'}">
+
+${checkIconHTML}
+
+</button>
+
+<span class="task-text text-2xl themed-text-primary">${escapeHtml(task.text)}</span>
+
+</div>
+
+<button data-task-id="${task.id}" class="task-delete-button text-red-500 hover:text-red-400 text-2xl px-2" aria-label="Delete task">&times;</button>
+
+`;
+
+                taskListUl.appendChild(li);
+
+            });
+
+
+            document.querySelectorAll('.task-toggle-button').forEach(button => {
+
+                button.addEventListener('click', (e) => {
+
+                    const id = e.currentTarget.dataset.taskId;
+
+                    const taskIndex = tasksCache.findIndex(t => t.id === id);
+
+                    if (taskIndex > -1) {
+
+                        tasksCache[taskIndex].completed = !tasksCache[taskIndex].completed;
+
+                        saveTasksToLocalStorage();
+
+                        renderTasks(tasksCache);
+
+                    }
+
+                });
+
+            });
+
+            document.querySelectorAll('.task-delete-button').forEach(button => {
+
+                button.addEventListener('click', (e) => {
+
+                    const id = e.currentTarget.dataset.taskId;
+
+                    tasksCache = tasksCache.filter(t => t.id !== id);
+
+                    saveTasksToLocalStorage();
+
+                    renderTasks(tasksCache);
+
+                });
+
+            });
+
+        }
+
+        function escapeHtml(unsafe) {
+
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+        }
+
+
+        addTaskButton.addEventListener('click', () => {
+
+            const text = newTaskInput.value.trim();
+
+            if (text === '') return;
+
+            tasksCache.push({ id: Date.now().toString(), text: text, completed: false, createdAt: new Date().toISOString() });
+
+            saveTasksToLocalStorage();
+
+            renderTasks(tasksCache);
+
+            newTaskInput.value = '';
+
+        });
+
+        newTaskInput.addEventListener('keypress', (e) => {
+
+            if (e.key === 'Enter') addTaskButton.click();
+
+        });
+
+
+        function loadTimerSettingsFromLocalStorage() {
+
+            const storedSettings = localStorage.getItem('focumia-timer-settings');
+
+            if (storedSettings) {
+
+                currentTimerSettings = { ...currentTimerSettings, ... (JSON.parse(storedSettings) || {}) };
+
+            }
+
+            timerSettingsForm.pomodoroDuration.value = currentTimerSettings.pomodoroDuration;
+
+            timerSettingsForm.shortBreakDuration.value = currentTimerSettings.shortBreakDuration;
+
+            timerSettingsForm.longBreakDuration.value = currentTimerSettings.longBreakDuration;
+
+            timerSettingsForm.pomodorosBeforeLongBreak.value = currentTimerSettings.pomodorosBeforeLongBreak;
+
+            timerSettingsForm.soundNotifications.checked = currentTimerSettings.soundNotifications;
+
+            timerSettingsForm.browserNotifications.checked = currentTimerSettings.browserNotifications;
+
+            timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+
+            updateTimerDisplay();
+
+        }
+
+
+        timerSettingsForm.addEventListener('submit', (e) => {
+
+            e.preventDefault();
+
+            currentTimerSettings = {
+
+                pomodoroDuration: parseInt(timerSettingsForm.pomodoroDuration.value) || 25,
+
+                shortBreakDuration: parseInt(timerSettingsForm.shortBreakDuration.value) || 5,
+
+                longBreakDuration: parseInt(timerSettingsForm.longBreakDuration.value) || 15,
+
+                pomodorosBeforeLongBreak: parseInt(timerSettingsForm.pomodorosBeforeLongBreak.value) || 4,
+
+                soundNotifications: timerSettingsForm.soundNotifications.checked,
+
+                browserNotifications: timerSettingsForm.browserNotifications.checked,
+
+            };
+
+            localStorage.setItem('focumia-timer-settings', JSON.stringify(currentTimerSettings));
+
+            settingsMessageDiv.textContent = "Timer settings saved!";
+
+            settingsMessageDiv.classList.remove('hidden');
+
+            setTimeout(() => settingsMessageDiv.classList.add('hidden'), 3000);
+
+            timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+
+            isBreakTime = false; isTimerActive = false;
+
+            clearInterval(pomodoroInterval); pomodoroInterval = null;
+
+            updateTimerDisplay();
+
+        });
+
+
+        function initApp() {
+
+            console.log("Initializing Focumia Rebuilt Theme Edition...");
+
+            applyTheme(currentTheme);
+
+
+            menuButton.innerHTML = ICONS.menu;
+
+            timerResetButton.innerHTML = ICONS.reset + " Reset";
+
+            timerSkipButton.innerHTML = ICONS.skip + " Skip";
+
+            addTaskButton.innerHTML = ICONS.plus;
+
+            // REMOVED: Lines that set innerHTML for old nav buttons
+
+            // document.querySelector('button[data-page="home"]').innerHTML = ICONS.focus + " Home";
+
+            // document.querySelector('button[data-page="settings"]').innerHTML = ICONS.settings + " Set";
+
+
+            themeToggleButton.addEventListener('click', () => {
+
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                applyTheme(currentTheme);
+
+            });
+
+
+            menuButton.addEventListener('click', (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); });
+
+            document.body.addEventListener('click', () => menuDropdown.classList.add('hidden'));
+
+            menuDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+
+            // Selector '.nav-item' will no longer match any elements, effectively only applying to '.menu-item'
+
+            document.querySelectorAll('.menu-item, .nav-item').forEach(item => {
+
+                item.addEventListener('click', () => {
+
+                    const pageId = item.dataset.page + '-page';
+
+                    showPage(pageId); // showPage already hides the menuDropdown
+
+                    if (pageId === 'settings-page') loadTimerSettingsFromLocalStorage();
+
+                });
+
+            });
+
+
+            loadTimerSettingsFromLocalStorage();
+
+            loadTasksFromLocalStorage();
+
+            mainAppAreaEl.classList.remove('hidden');
+
+            showPage('home-page'); // Default to home page
+
+
+            setTimeout(() => {
+
+                splashScreenEl.classList.remove('active');
+
+                splashScreenEl.classList.add('hidden');
+
+            }, 1200);
+
+
+            if (currentTimerSettings.browserNotifications && Notification.permission !== "granted" && Notification.permission !== "denied") {
+
+                Notification.requestPermission().then(p => console.log("Browser N. Perm:", p));
+
+            }
+
+            updateTimerDisplay();
+
+        }
+
+
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+
+</body>
+
+</html>
