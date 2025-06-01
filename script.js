@@ -3,7 +3,6 @@ let currentTheme = localStorage.getItem('focumia-theme') || 'light';
 let currentTimerSettings = {
     pomodoroDuration: 25, shortBreakDuration: 5, longBreakDuration: 15,
     pomodorosBeforeLongBreak: 4, soundNotifications: true, browserNotifications: true
-    // 'enhancedFocusMode' was removed as per your HTML
 };
 let tasksCache = [];
 let pomodoroInterval = null;
@@ -26,7 +25,7 @@ const allPages = document.querySelectorAll('.page');
 const themeToggleButton = document.getElementById('theme-toggle-button');
 const menuButton = document.getElementById('menu-button');
 const menuDropdown = document.getElementById('menu-dropdown');
-const logoFocumiaEl = document.getElementById('logo-focumia'); 
+const logoFocumiaEl = document.getElementById('logo-focumia');
 
 
 const pomodoroStatusTextEl = document.getElementById('pomodoro-status-text');
@@ -90,12 +89,23 @@ function loadStreaksDataFromLocalStorage() {
         }));
         saveStreaksDataToLocalStorage();
     } else {
-        streaksData[currentWeekIdentifier] = streaksData[currentWeekIdentifier].map((dayData, index) => ({
-            day: dayData.day || DAY_NAMES[index],
-            tasksCompletedScore: dayData.tasksCompletedScore || 0,
-            focusSessionsScore: dayData.focusSessionsScore || 0,
-            totalScore: (dayData.tasksCompletedScore || 0) + (dayData.focusSessionsScore || 0)
-        }));
+        // Ensure all days are present and scores are numbers, calculating totalScore
+        const currentWeekData = streaksData[currentWeekIdentifier];
+        const validatedWeekData = DAY_NAMES.map((dayName, index) => {
+            const existingDayData = currentWeekData.find(d => d.day === dayName) || (currentWeekData[index] && currentWeekData[index].day === dayName ? currentWeekData[index] : null) ;
+            if (existingDayData) {
+                const tasksScore = Number(existingDayData.tasksCompletedScore) || 0;
+                const focusScore = Number(existingDayData.focusSessionsScore) || 0;
+                return {
+                    day: dayName,
+                    tasksCompletedScore: tasksScore,
+                    focusSessionsScore: focusScore,
+                    totalScore: tasksScore + focusScore
+                };
+            }
+            return { day: dayName, tasksCompletedScore: 0, focusSessionsScore: 0, totalScore: 0 };
+        });
+        streaksData[currentWeekIdentifier] = validatedWeekData;
     }
 }
 
@@ -104,14 +114,21 @@ function saveStreaksDataToLocalStorage() {
 }
 
 function updateStreakScore(type) {
-    loadStreaksDataFromLocalStorage();
+    loadStreaksDataFromLocalStorage(); // Ensure we have the latest, especially week identifier
     const todayIndex = getCurrentDayISO();
 
-    if (streaksData[currentWeekIdentifier] && streaksData[currentWeekIdentifier][todayIndex]) {
-        const dayData = streaksData[currentWeekIdentifier][todayIndex];
+    if (!streaksData[currentWeekIdentifier]) { // If new week started and not initialized by load
+        streaksData[currentWeekIdentifier] = DAY_NAMES.map(dayName => ({
+            day: dayName, tasksCompletedScore: 0, focusSessionsScore: 0, totalScore: 0
+        }));
+    }
+    
+    const dayData = streaksData[currentWeekIdentifier][todayIndex];
+
+    if (dayData) {
         if (type === 'task') dayData.tasksCompletedScore += 10;
         else if (type === 'focus') dayData.focusSessionsScore += 5;
-        dayData.totalScore = dayData.tasksCompletedScore + dayData.focusSessionsScore;
+        dayData.totalScore = (dayData.tasksCompletedScore || 0) + (dayData.focusSessionsScore || 0);
         saveStreaksDataToLocalStorage();
 
         if (document.getElementById('streaks-page')?.classList.contains('active')) {
@@ -119,7 +136,7 @@ function updateStreakScore(type) {
             renderStreaksChart();
         }
     } else {
-        console.error("Failed to update streak score for", currentWeekIdentifier, todayIndex);
+        console.error("Failed to update streak score for", currentWeekIdentifier, `day index: ${todayIndex}`);
     }
 }
 
@@ -140,13 +157,13 @@ function applyTheme(theme) {
         ::-webkit-scrollbar-thumb:hover { background: ${computedStyles.getPropertyValue('--scrollbar-thumb-hover')}; }
     `;
     document.head.appendChild(newScrollbarStyle);
-    
+
     if (document.getElementById('home-page')?.classList.contains('active')) {
-        renderTasks(tasksCache); 
-        renderWeeklyCalendar(); 
+        renderTasks(tasksCache);
+        renderWeeklyCalendar();
     }
     if (document.getElementById('streaks-page')?.classList.contains('active')) {
-        renderStreaksChart(); 
+        renderStreaksChart(); // Re-render chart as colors might change
     }
 }
 
@@ -154,12 +171,12 @@ function renderWeeklyCalendar() {
     if (!calendarDaysContainer) return;
     calendarDaysContainer.innerHTML = '';
     const today = new Date();
-    const currentDayOfWeekISO = getCurrentDayISO();
+    const currentDayOfWeekISO = getCurrentDayISO(); // 0 for Mon, 6 for Sun
 
     for (let i = 0; i < 7; i++) {
         const dayDate = new Date(today);
         dayDate.setDate(today.getDate() - currentDayOfWeekISO + i);
-        const dateStringForReview = dayDate.toISOString().split('T')[0]; 
+        const dateStringForReview = dayDate.toISOString().split('T')[0];
 
         const dayDiv = document.createElement('div');
         dayDiv.className = 'calendar-day-item flex-1 flex flex-col items-center justify-center p-2 rounded-lg jersey-10-regular themed-bg-secondary';
@@ -167,7 +184,7 @@ function renderWeeklyCalendar() {
 
         const dayNameSpan = document.createElement('span');
         dayNameSpan.className = 'text-lg md:text-xl themed-text-secondary';
-        dayNameSpan.textContent = DAY_NAMES[i];
+        dayNameSpan.textContent = DAY_NAMES[i]; // Use DAY_NAMES for consistency
         const dateNumberSpan = document.createElement('span');
         dateNumberSpan.className = 'text-3xl md:text-4xl themed-text-primary mt-1';
         dateNumberSpan.textContent = dayDate.getDate();
@@ -177,11 +194,12 @@ function renderWeeklyCalendar() {
         if (i === currentDayOfWeekISO) {
             dayDiv.classList.remove('themed-bg-secondary');
             dayDiv.classList.add('themed-button-primary', 'current-calendar-day');
+            // Text color for current day should adapt to button's text color
             const buttonPrimaryTextColor = getComputedStyle(bodyEl).getPropertyValue('--button-primary-text').trim();
             dayNameSpan.style.color = buttonPrimaryTextColor;
             dateNumberSpan.style.color = buttonPrimaryTextColor;
         }
-        
+
         dayDiv.addEventListener('click', () => {
             showHomepageReview(dateStringForReview);
         });
@@ -196,19 +214,20 @@ function showPage(pageId) {
     });
     if (menuDropdown) menuDropdown.classList.add('hidden');
 
+    // Hide review section if navigating away from home page
     if (pageId !== 'home-page' && homepageReviewSection && !homepageReviewSection.classList.contains('hidden')) {
         hideHomepageReview();
     }
 
     if (pageId === 'home-page') {
         renderTasks(tasksCache);
-        renderWeeklyCalendar();
+        renderWeeklyCalendar(); // Re-render calendar, e.g., if day changes
     } else if (pageId === 'streaks-page') {
-        loadStreaksDataFromLocalStorage();
+        loadStreaksDataFromLocalStorage(); // Ensure fresh data
         renderStreaksTable();
         renderStreaksChart();
     }
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // Scroll to top on page change
 }
 
 function formatTime(seconds) {
@@ -225,22 +244,23 @@ function updateTimerDisplay() {
 
 function playNotifSound() {
     if (currentTimerSettings.soundNotifications && notificationSound) {
+        notificationSound.currentTime = 0; // Rewind to start
         notificationSound.play().catch(e => console.warn("Audio play failed:", e));
     }
 }
 function showBrowserNotification(title, body) {
     if (currentTimerSettings.browserNotifications && Notification.permission === "granted") {
-        new Notification(title, { body });
+        new Notification(title, { body, icon: 'logo.png' });
     }
 }
 
 function startNextCycle() {
     isTimerActive = false;
-    if (isBreakTime) {
+    if (isBreakTime) { // Break just finished, start focus
         isBreakTime = false;
         timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
         showBrowserNotification("Break Over!", "Time to get back to focus!");
-    } else {
+    } else { // Focus just finished, start break & update score
         updateStreakScore('focus');
         pomodorosSessionCount++;
         isBreakTime = true;
@@ -278,16 +298,19 @@ if (timerResetButton) timerResetButton.addEventListener('click', () => {
 });
 if (timerSkipButton) timerSkipButton.addEventListener('click', () => {
     clearInterval(pomodoroInterval); pomodoroInterval = null;
-    startNextCycle();
+    startNextCycle(); // This will also handle if currently in focus or break
 });
 
 function saveTasksToLocalStorage() {localStorage.setItem('focumia-tasks', JSON.stringify(tasksCache));}
 function loadTasksFromLocalStorage() {
     const storedTasks = localStorage.getItem('focumia-tasks');
     tasksCache = storedTasks ? (JSON.parse(storedTasks) || []) : [];
-    tasksCache.forEach(task => { 
+    // Data migration/validation for older tasks
+    tasksCache.forEach(task => {
         if (task.completionDate === undefined) task.completionDate = null;
         if (task.hasAwardedCompletionPoints === undefined) {
+            // If completed and has a completion date, assume points were awarded in older versions or should have been.
+            // For new logic, points are only awarded on transition to completed.
             task.hasAwardedCompletionPoints = (task.completed && task.completionDate) ? true : false;
         }
     });
@@ -312,54 +335,72 @@ function renderTasks(tasks) {
                 <button data-task-id="${task.id}" class="task-toggle-button w-7 h-7 mr-4 rounded flex items-center justify-center transition-all ${task.completed ? 'completed' : 'incomplete'}">${checkIconHTML}</button>
                 <span class="task-text text-2xl themed-text-primary">${escapeHtml(task.text)}</span>
             </div>
-            <button data-task-id="${task.id}" class="task-delete-button text-red-500 hover:text-red-400 text-2xl px-2 ml-2" aria-label="Delete task">&times;</button>
-        `; 
+            <button data-task-id="${task.id}" class="task-delete-button text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-2xl px-2 ml-2" aria-label="Delete task">&times;</button>
+        `;
         taskListUl.appendChild(li);
     });
 
     taskListUl.querySelectorAll('.task-toggle-button').forEach(button => button.addEventListener('click', (e) => {
         const id = e.currentTarget.dataset.taskId;
         const taskIndex = tasksCache.findIndex(t => t.id === id);
-        if (taskIndex > -1) { 
+        if (taskIndex > -1) {
             const task = tasksCache[taskIndex];
-            task.completed = !task.completed; 
-            
+            const wasCompleted = task.completed;
+            task.completed = !task.completed;
+
             if (task.completed) {
-                task.completionDate = new Date().toISOString().split('T')[0];
-                if (!task.hasAwardedCompletionPoints) { 
-                    updateStreakScore('task'); 
-                    task.hasAwardedCompletionPoints = true; 
+                task.completionDate = new Date().toISOString().split('T')[0]; // Set completion date
+                if (!wasCompleted && !task.hasAwardedCompletionPoints) { // Award points only if transitioning to completed and not already awarded
+                    updateStreakScore('task');
+                    task.hasAwardedCompletionPoints = true;
                 }
             } else {
+                // If unchecking a task, streak points are generally not removed to avoid complexity,
+                // but we reset completion date and awarded status if strictness is desired (current logic allows re-awarding if uncheck then re-check)
+                // For simplicity, we will allow re-awarding if un-checked and re-checked later for a *new* completion.
+                // However, if un-checking a task whose points were awarded, we should prevent re-awarding for *that same* completion instance.
+                // The `hasAwardedCompletionPoints` flag handles this. If user unchecks and rechecks, the flag is still true for that task id.
+                // A more robust system might involve unique completion IDs if tasks can be "re-opened".
+                // Current logic: If unchecking, reset completion date. Points logic relies on hasAwardedCompletionPoints.
                 task.completionDate = null;
+                // Optional: If unchecking means points should be revocable or task can be re-completed for new points later:
+                // task.hasAwardedCompletionPoints = false; // This would allow getting points again if re-completed
             }
-            saveTasksToLocalStorage(); 
-            renderTasks(tasksCache); 
+            saveTasksToLocalStorage();
+            renderTasks(tasksCache);
         }
     }));
-    
+
     taskListUl.querySelectorAll('.task-delete-button').forEach(button => {
         button.addEventListener('click', (e) => {
             const id = e.currentTarget.dataset.taskId;
             const taskIndex = tasksCache.findIndex(t => t.id === id);
             if (taskIndex > -1) {
-                tasksCache.splice(taskIndex, 1); 
-                saveTasksToLocalStorage();
-                renderTasks(tasksCache); 
+                // Optional: Confirm before deleting
+                // if (confirm(`Are you sure you want to delete task: "${tasksCache[taskIndex].text}"?`)) {
+                    tasksCache.splice(taskIndex, 1);
+                    saveTasksToLocalStorage();
+                    renderTasks(tasksCache);
+                // }
             }
         });
     });
 }
-function escapeHtml(unsafe) { 
-    return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
 }
 
 if (addTaskButton && newTaskInput) {
     addTaskButton.addEventListener('click', () => {
         const text = newTaskInput.value.trim();
         if (text === '') return;
-        tasksCache.push({ 
-            id: Date.now().toString(), text: text, completed: false, 
+        tasksCache.push({
+            id: Date.now().toString(), text: text, completed: false,
             createdAt: new Date().toISOString(), completionDate: null,
             hasAwardedCompletionPoints: false
         });
@@ -371,11 +412,15 @@ if (addTaskButton && newTaskInput) {
 function loadTimerSettingsFromLocalStorage() {
     const storedSettings = localStorage.getItem('focumia-timer-settings');
     if (storedSettings) {
-        currentTimerSettings = { ...currentTimerSettings, ...JSON.parse(storedSettings) };
+        const parsedSettings = JSON.parse(storedSettings);
+        // Merge, ensuring no old/unexpected properties are carried over
+        currentTimerSettings.pomodoroDuration = parsedSettings.pomodoroDuration || 25;
+        currentTimerSettings.shortBreakDuration = parsedSettings.shortBreakDuration || 5;
+        currentTimerSettings.longBreakDuration = parsedSettings.longBreakDuration || 15;
+        currentTimerSettings.pomodorosBeforeLongBreak = parsedSettings.pomodorosBeforeLongBreak || 4;
+        currentTimerSettings.soundNotifications = typeof parsedSettings.soundNotifications === 'boolean' ? parsedSettings.soundNotifications : true;
+        currentTimerSettings.browserNotifications = typeof parsedSettings.browserNotifications === 'boolean' ? parsedSettings.browserNotifications : true;
     }
-    // Ensure no enhancedFocusMode property is expected or set by default from old storage
-    delete currentTimerSettings.enhancedFocusMode;
-
 
     if (timerSettingsForm) {
         timerSettingsForm.pomodoroDuration.value = currentTimerSettings.pomodoroDuration;
@@ -384,9 +429,13 @@ function loadTimerSettingsFromLocalStorage() {
         timerSettingsForm.pomodorosBeforeLongBreak.value = currentTimerSettings.pomodorosBeforeLongBreak;
         timerSettingsForm.soundNotifications.checked = currentTimerSettings.soundNotifications;
         timerSettingsForm.browserNotifications.checked = currentTimerSettings.browserNotifications;
+        // Ensure 'enhancedFocusMode' checkbox state is handled if it's re-added
+        // if (timerSettingsForm.enhancedFocusMode) {
+        //     timerSettingsForm.enhancedFocusMode.checked = currentTimerSettings.enhancedFocusMode || false;
+        // }
     }
     timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
-    updateTimerDisplay();
+    updateTimerDisplay(); // Update display with loaded/default settings
 }
 
 if (timerSettingsForm) timerSettingsForm.addEventListener('submit', (e) => {
@@ -398,24 +447,36 @@ if (timerSettingsForm) timerSettingsForm.addEventListener('submit', (e) => {
         pomodorosBeforeLongBreak: parseInt(timerSettingsForm.pomodorosBeforeLongBreak.value) || 4,
         soundNotifications: timerSettingsForm.soundNotifications.checked,
         browserNotifications: timerSettingsForm.browserNotifications.checked,
+        // enhancedFocusMode: timerSettingsForm.enhancedFocusMode ? timerSettingsForm.enhancedFocusMode.checked : false, // if re-added
     };
     localStorage.setItem('focumia-timer-settings', JSON.stringify(currentTimerSettings));
-    
+
     if (settingsMessageDiv) {
         settingsMessageDiv.textContent = "Timer settings saved!";
         settingsMessageDiv.classList.remove('hidden');
         setTimeout(() => settingsMessageDiv.classList.add('hidden'), 3000);
     }
 
-    timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
-    isBreakTime = false; isTimerActive = false; clearInterval(pomodoroInterval); pomodoroInterval = null;
-    updateTimerDisplay();
+    // Reset timer to reflect new settings if it's not running
+    if (!isTimerActive) {
+        timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+        isBreakTime = false; // Ensure it resets to focus time
+        pomodorosSessionCount = 0; // Reset session count for long break logic
+        updateTimerDisplay();
+    }
+    // If timer IS active, changes will apply to the NEXT session.
+    // Or, decide to stop and reset timer immediately:
+    // clearInterval(pomodoroInterval); pomodoroInterval = null;
+    // isTimerActive = false; isBreakTime = false; pomodorosSessionCount = 0;
+    // timeLeftInSeconds = currentTimerSettings.pomodoroDuration * 60;
+    // updateTimerDisplay();
 });
 
 // --- Streaks Page Rendering ---
 function renderStreaksTable() {
     const container = document.getElementById('streaksTableContainer');
     if (!container) return;
+
     const weekData = streaksData[currentWeekIdentifier] || DAY_NAMES.map(dayName => ({day: dayName, tasksCompletedScore:0, focusSessionsScore:0, totalScore:0}));
     let tableHTML = `<table class="w-full text-left themed-text-primary text-xl md:text-2xl jersey-10-regular"><thead class="themed-border-b"><tr>
         <th class="p-2 sm:p-3">Day</th><th class="p-2 sm:p-3 text-right">Task Score</th><th class="p-2 sm:p-3 text-right">Focus Score</th><th class="p-2 sm:p-3 text-right font-bold">Total Score</th>
@@ -435,13 +496,34 @@ function renderStreaksChart() {
     const labels = weekData.map(d => d.day);
     const scores = weekData.map(d => d.totalScore);
     const bodyStyles = getComputedStyle(document.body);
-    const primaryButtonBg = bodyStyles.getPropertyValue('--button-primary-bg').trim() || '#000000';
+
+    // Use a reliable way to get theme colors for chart
+    const primaryButtonBg = bodyStyles.getPropertyValue('--button-primary-bg').trim() || (currentTheme === 'dark' ? '#FFFFFF' : '#000000');
+    const textColorSecondary = bodyStyles.getPropertyValue('--text-secondary').trim() || (currentTheme === 'dark' ? '#b0b0b0' : '#555555');
+    const textColorPrimary = bodyStyles.getPropertyValue('--text-primary').trim() || (currentTheme === 'dark' ? '#FFFFFF' : '#000000');
+    const borderColor = bodyStyles.getPropertyValue('--border-color').trim() || (currentTheme === 'dark' ? '#333333' : '#cccccc');
+
+    // Function to convert rgb/hex to rgba with alpha
+    function colorToRgba(color, alpha) {
+        if (color.startsWith('#')) {
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        } else if (color.startsWith('rgb(')) {
+            return color.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`);
+        } else if (color.startsWith('rgba(')) { // If already rgba, try to replace alpha
+             return color.replace(/,\s*\d(\.\d+)?\)/, `, ${alpha})`);
+        }
+        return color; // Fallback
+    }
+
     const chartData = {
         labels: labels,
         datasets: [{
             label: 'Daily Score', data: scores, fill: true,
             borderColor: primaryButtonBg,
-            backgroundColor: primaryButtonBg.startsWith('rgba') ? primaryButtonBg.replace(/,\s*\d(\.\d+)?\)/, ', 0.2)') : primaryButtonBg.replace('rgb', 'rgba').replace(')', ', 0.2)'),
+            backgroundColor: colorToRgba(primaryButtonBg, 0.2),
             tension: 0.2, pointRadius: 5, pointBackgroundColor: primaryButtonBg,
         }]
     };
@@ -451,10 +533,10 @@ function renderStreaksChart() {
         options: {
             responsive: true, maintainAspectRatio: false,
             scales: {
-                y: { beginAtZero: true, ticks: { color: bodyStyles.getPropertyValue('--text-secondary').trim(), font: { family: "'Jersey 10', sans-serif", size: 14 }}, grid: { color: bodyStyles.getPropertyValue('--border-color').trim() }},
-                x: { ticks: { color: bodyStyles.getPropertyValue('--text-secondary').trim(), font: { family: "'Jersey 10', sans-serif", size: 14 }}, grid: { display: false }}
+                y: { beginAtZero: true, ticks: { color: textColorSecondary, font: { family: "'Jersey 10', sans-serif", size: 14 }}, grid: { color: borderColor }},
+                x: { ticks: { color: textColorSecondary, font: { family: "'Jersey 10', sans-serif", size: 14 }}, grid: { display: false }}
             },
-            plugins: { legend: { display: true, labels: { color: bodyStyles.getPropertyValue('--text-primary').trim(), font: { family: "'Jersey 10', sans-serif", size: 16 }}}}
+            plugins: { legend: { display: true, labels: { color: textColorPrimary, font: { family: "'Jersey 10', sans-serif", size: 16 }}}}
         }
     });
 }
@@ -467,10 +549,15 @@ function deleteApplicationHistory() {
         localStorage.removeItem('focumia-timer-settings');
         localStorage.removeItem('focumia-streaksData');
 
+        // Reset in-memory state, though reload will handle most of this
         tasksCache = [];
         streaksData = {};
-        currentTimerSettings = { pomodoroDuration: 25, shortBreakDuration: 5, longBreakDuration: 15, pomodorosBeforeLongBreak: 4, soundNotifications: true, browserNotifications: true };
-        
+        currentTimerSettings = {
+            pomodoroDuration: 25, shortBreakDuration: 5, longBreakDuration: 15,
+            pomodorosBeforeLongBreak: 4, soundNotifications: true, browserNotifications: true
+        };
+        // No need to reset enhancedFocusMode here as it's removed from general settings object
+
         alert("All application data has been deleted. The app will now reload.");
         location.reload();
     }
@@ -479,26 +566,26 @@ function deleteApplicationHistory() {
 // --- Homepage Review Functions ---
 function showHomepageReview(dateString) {
     if (!homepageReviewSection || !homepageReviewTitle || !homepageReviewContent) return;
-    
-    const parts = dateString.split('-');
+
+    const parts = dateString.split('-'); // YYYY-MM-DD
     const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; 
+    const month = parseInt(parts[1], 10) - 1; // JS months are 0-indexed
     const day = parseInt(parts[2], 10);
     const dateObj = new Date(year, month, day);
 
     homepageReviewTitle.textContent = `Completed on ${dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}`;
-    
+
     const tasksCompletedThatDay = tasksCache.filter(task => task.completed && task.completionDate === dateString);
 
-    homepageReviewContent.innerHTML = ''; 
-    
+    homepageReviewContent.innerHTML = ''; // Clear previous content
+
     if (tasksCompletedThatDay.length > 0) {
         const ulCompleted = document.createElement('ul');
-        ulCompleted.className = 'space-y-2 list-disc list-inside ml-0';
+        ulCompleted.className = 'space-y-2 list-disc list-inside ml-0'; // Adjusted for better list appearance
         tasksCompletedThatDay.forEach(task => {
             const li = document.createElement('li');
-            li.className = 'themed-text-primary text-xl';
-            li.textContent = task.text;
+            li.className = 'themed-text-primary text-xl'; // Ensure text color is primary for readability
+            li.textContent = escapeHtml(task.text); // Escape task text
             ulCompleted.appendChild(li);
         });
         homepageReviewContent.appendChild(ulCompleted);
@@ -508,7 +595,7 @@ function showHomepageReview(dateString) {
         pNoneCompleted.textContent = 'No tasks were completed on this day.';
         homepageReviewContent.appendChild(pNoneCompleted);
     }
-    
+
     homepageReviewSection.classList.remove('hidden');
     homepageReviewSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
@@ -529,9 +616,9 @@ const FOOTER_HTML = `
         Follow us on <a href="https://github.com/codliro" target="_blank" rel="noopener noreferrer" class="themed-text-primary hover:underline">GitHub</a>.
     </p>
     <p class="mt-2">
-        <a href="https://github.com/codliro/focumia/issues" target="_blank" rel="noopener noreferrer" class="menu-item-link themed-text-primary hover:underline" data-page="bug-report-external">Report a Bug</a> | 
-        <a href="#" class="menu-item-link themed-text-primary hover:underline" data-page="privacy-policy">Privacy Policy</a> | 
-        <a href="#" class="menu-item-link themed-text-primary hover:underline" data-page="cookie-policy">Cookie Policy</a> | 
+        <a href="https://github.com/codliro/focumia/issues" target="_blank" rel="noopener noreferrer" class="menu-item-link themed-text-primary hover:underline" data-page="bug-report-external">Report a Bug</a> |
+        <a href="#" class="menu-item-link themed-text-primary hover:underline" data-page="privacy-policy">Privacy Policy</a> |
+        <a href="#" class="menu-item-link themed-text-primary hover:underline" data-page="cookie-policy">Cookie Policy</a> |
         <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer" class="menu-item-link themed-text-primary hover:underline" data-page="license-external">MIT License</a>
     </p>
 `;
@@ -539,10 +626,10 @@ const FOOTER_HTML = `
 function initApp() {
     console.log("Initializing Focumia App...");
     loadTimerSettingsFromLocalStorage();
-    loadTasksFromLocalStorage(); 
-    loadStreaksDataFromLocalStorage(); 
-    
-    applyTheme(currentTheme); 
+    loadTasksFromLocalStorage();
+    loadStreaksDataFromLocalStorage();
+
+    applyTheme(currentTheme); // Apply theme early
 
     document.querySelectorAll('.page-footer').forEach(footer => {
         footer.innerHTML = FOOTER_HTML;
@@ -551,54 +638,90 @@ function initApp() {
     if (logoFocumiaEl) {
         logoFocumiaEl.addEventListener('click', () => {
             showPage('home-page');
-            if (homepageReviewSection && !homepageReviewSection.classList.contains('hidden')) {
+            if (homepageReviewSection && !homepageReviewSection.classList.contains('hidden')) { // Hide review if open
                 hideHomepageReview();
             }
         });
     }
 
+    // Set icons for buttons
     if (menuButton) menuButton.innerHTML = ICONS.menu;
-    if (timerStartPauseButton) timerStartPauseButton.innerHTML = ICONS.play + " Start";
+    if (timerStartPauseButton) timerStartPauseButton.innerHTML = ICONS.play + " Start"; // Initial state
     if (timerResetButton) timerResetButton.innerHTML = ICONS.reset + " Reset";
     if (timerSkipButton) timerSkipButton.innerHTML = ICONS.skip + " Skip";
     if (addTaskButton) addTaskButton.innerHTML = ICONS.plus;
 
+    // Event Listeners
     if (themeToggleButton) themeToggleButton.addEventListener('click', () => {
         currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(currentTheme);
     });
+
     if (menuButton && menuDropdown) {
         menuButton.addEventListener('click', (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); });
-        bodyEl.addEventListener('click', (e) => {
+        bodyEl.addEventListener('click', (e) => { // Close dropdown if clicking outside
             if (menuDropdown && !menuDropdown.classList.contains('hidden') && !menuDropdown.contains(e.target) && e.target !== menuButton && !menuButton.contains(e.target)) {
                  menuDropdown.classList.add('hidden');
             }
         });
-        menuDropdown.addEventListener('click', (e) => e.stopPropagation());
+        menuDropdown.addEventListener('click', (e) => e.stopPropagation()); // Prevent closing when clicking inside dropdown
     }
-    
+
     document.querySelectorAll('.menu-item, .menu-item-link').forEach(item => {
         const pageName = item.dataset.page;
-        if (pageName && !pageName.endsWith('-external')) { 
+        if (pageName && !pageName.endsWith('-external')) { // Handle internal page links
             item.addEventListener('click', (e) => {
-                if(item.getAttribute('href') === '#') e.preventDefault(); 
-                
+                if(item.getAttribute('href') === '#') e.preventDefault(); // Prevent hash jump for non-external links
+
                 const pageId = pageName + '-page';
                 showPage(pageId);
-                
-                if (item.closest('#menu-dropdown') && menuDropdown) {
+
+                if (item.closest('#menu-dropdown') && menuDropdown) { // Close dropdown after selection
                     menuDropdown.classList.add('hidden');
                 }
             });
         }
+        // External links (data-page ends with '-external') will work via their href attribute naturally
     });
-    
-    if (mainAppAreaEl) mainAppAreaEl.classList.remove('hidden');
-    showPage('home-page'); 
-    if (splashScreenEl) setTimeout(() => { splashScreenEl.classList.remove('active'); splashScreenEl.classList.add('hidden'); }, 1200);
-    if (currentTimerSettings.browserNotifications && typeof Notification !== 'undefined' && Notification.permission !== "granted" && Notification.permission !== "denied") {
-         Notification.requestPermission().then(p => console.log("Browser Notification Permission:", p));
+
+    // ***** FIX: Attach event listener for Delete All Data button *****
+    const deleteHistoryButton = document.getElementById('delete-history-button');
+    if (deleteHistoryButton) {
+        deleteHistoryButton.addEventListener('click', deleteApplicationHistory);
     }
-    updateTimerDisplay(); 
+    // ***** END FIX *****
+
+    if (mainAppAreaEl) mainAppAreaEl.classList.remove('hidden');
+    showPage('home-page'); // Show home page by default
+
+    if (splashScreenEl) { // Handle splash screen fade out
+        setTimeout(() => {
+            splashScreenEl.style.opacity = '0'; // Start fade out
+            splashScreenEl.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => {
+                splashScreenEl.classList.remove('active');
+                splashScreenEl.classList.add('hidden');
+            }, 500); // Wait for fade out transition to complete
+        }, 1200); // Initial delay before fading splash
+    }
+
+
+    // Request notification permission if not already granted or denied
+    if (currentTimerSettings.browserNotifications && typeof Notification !== 'undefined' && Notification.permission !== "granted" && Notification.permission !== "denied") {
+         Notification.requestPermission().then(permission => {
+            console.log("Browser Notification Permission:", permission);
+            if (permission === "denied" && timerSettingsForm && timerSettingsForm.browserNotifications) {
+                // Optionally uncheck the box if permission is denied by user
+                // timerSettingsForm.browserNotifications.checked = false;
+                // currentTimerSettings.browserNotifications = false;
+                // localStorage.setItem('focumia-timer-settings', JSON.stringify(currentTimerSettings));
+            }
+         });
+    }
+
+    updateTimerDisplay(); // Ensure timer display is correct on load
+    renderWeeklyCalendar(); // Initial render of calendar
+    // renderTasks(tasksCache); // Already called by showPage('home-page') -> renderTasks
 }
 
+// Initialize the app once the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', initApp);
