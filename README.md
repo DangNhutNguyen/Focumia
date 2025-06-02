@@ -68,7 +68,6 @@ Focumia is designed for easy local use:
 
 * **Found a bug or have a feature suggestion?**  
   Please report it on our GitHub Issues page: [https://github.com/codliro/focumia/issues](https://github.com/codliro/focumia/issues)  
-  *(Note: This is a hypothetical link. Please update it if you create a public repository for Focumia.)*
 
 * **General Inquiries:**  
   You can reach out via email at [penciltalk0910@gmail.com](mailto:penciltalk0910@gmail.com).
